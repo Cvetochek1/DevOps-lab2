@@ -1,0 +1,68 @@
+---
+- name: Установить git, Docker и Docker Compose
+  apt:
+    name:
+      - git
+      - docker.io
+      - docker-compose
+    state: present
+    update_cache: yes
+  tags: start
+
+- name: Удалить старые каталоги приложения
+  file:
+    path: "{{ app_dir }}"
+    state: absent
+  tags: start
+
+- name: Создать каталог для приложения
+  file:
+    path: "{{ app_dir }}"
+    state: directory
+    mode: '0755'
+  tags: start
+
+- name: склонировать репозиторий backend (ветка main)
+  git:
+    repo: "{{ backend_repo }}"
+    dest: "{{ app_dir }}/backend"
+    version: main
+  tags: start
+
+- name: склонировать репозиторий frontend (ветка main)
+  git:
+    repo: "{{ frontend_repo }}"
+    dest: "{{ app_dir }}/frontend"
+    version: main
+  tags: start
+
+- name: склонировать репозиторий DevOps (с docker-compose)
+  git:
+    repo: "{{ devops_repo }}"
+    dest: "{{ app_dir }}/DevOps"
+    version: main
+  tags: start
+
+- name: Скопировать docker-compose.yml в корень app_dir
+  copy:
+    src: "{{ app_dir }}/DevOps/docker-compose.yml"
+    dest: "{{ app_dir }}/docker-compose.yml"
+    remote_src: yes
+  tags: start
+
+- name: Сгенерировать конфигурационный файл из шаблона
+  template:
+    src: template01.j2
+    dest: "{{ app_dir }}/info.txt"
+  tags: start
+
+- name: Запустить микросервисы (docker-compose up -d --build)
+  command: docker-compose up -d --build
+  args:
+    chdir: "{{ app_dir }}"
+  tags: start
+
+- name: Подключить подзадачу остановки
+  include_tasks: subtasks/subtask.yml
+  tags: stop
+  

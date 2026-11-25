@@ -1,0 +1,5 @@
+---
+- name: Остановить микросервисы (docker-compose down)
+  command: docker-compose down
+  args:
+    chdir: "{{ app_dir }}"

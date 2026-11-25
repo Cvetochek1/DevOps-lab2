@@ -1,0 +1,6 @@
+github_user: Cvetochek1
+app_dir: /opt/app
+app_version: v2.0
+backend_repo: "https://github.com/{{ github_user }}/backend-1lab-DevOps.git"
+frontend_repo: "https://github.com/{{ github_user }}/frontend-1lab-DevOps.git"
+devops_repo: "https://github.com/{{ github_user }}/DevOps-lab2.git"
